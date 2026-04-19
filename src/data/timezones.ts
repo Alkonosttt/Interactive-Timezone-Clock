@@ -17,12 +17,30 @@ export function getZoneColor(zone: number): string {
 }
 
 export function offsetToHour(offset: number): number {
-    const utcHour = new Date().getUTCHours();
-    return ((utcHour + Math.round(offset)) % 24 + 24) % 24;
+    const now = new Date();
+
+    const utcMinutes =
+        now.getUTCHours() * 60 +
+        now.getUTCMinutes();
+
+    const offsetMinutes =
+        Math.round(offset * 60);
+
+    const localMinutes =
+        ((utcMinutes + offsetMinutes) % 1440 + 1440) % 1440;
+
+    return Math.floor(localMinutes / 60);
 }
 
 export function hourToOffset(displayedHour: number): number {
-    const utcHour = new Date().getUTCHours();
-    const difference = displayedHour - utcHour;
-    return ((difference + 24) % 24 <= 12) ? difference : difference - 24;
+    const now = new Date();
+
+    const utcHour = now.getUTCHours();
+
+    let diff = displayedHour - utcHour;
+
+    if (diff > 12) diff -= 24;
+    if (diff < -12) diff += 24;
+
+    return diff;
 }
